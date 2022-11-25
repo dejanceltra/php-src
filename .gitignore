@@ -295,3 +295,9 @@ tmp-php.ini
 !/ext/fileinfo/magicdata.patch
 !/ext/pcre/pcre2lib/config.h
 !/win32/build/Makefile
+
+#
+# [dejanceltra]
+#
+ext/opcache/jit/zend_jit_arm64.c
+.bash-history
