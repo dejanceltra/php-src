@@ -12,6 +12,7 @@ set -eu -o pipefail
  --enable-opcache \
  --enable-sockets \
  --enable-soap \
+ --enable-pcntl \
  --with-curl \
  --with-freetype \
  --with-fpm-user=www-data \
@@ -23,7 +24,6 @@ set -eu -o pipefail
  --with-pdo-mysql \
  --with-pgsql \
  --with-xsl \
- --with-zlib \
- --with-pcntl
+ --with-zlib
 
 make -j 8
