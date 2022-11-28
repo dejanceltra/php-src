@@ -1722,6 +1722,7 @@ PHPAPI void php_free_shutdown_functions(void) /* {{{ */
 /* {{{ Register a user-level function to be called on request termination */
 PHP_FUNCTION(register_shutdown_function)
 {
+	printf("[dean] register_shutdown_function\n");
 	php_shutdown_function_entry entry;
 	zval *params = NULL;
 	uint32_t param_count = 0;
