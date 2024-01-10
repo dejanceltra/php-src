@@ -537,6 +537,17 @@ int odbc_bindcols(odbc_result *result)
 	SQLLEN      	displaysize;
 	SQLUSMALLINT	colfieldid;
 	int		charextraalloc;
+	fprintf( stderr, "[dean] odbc_bindcols, %ld, %ld\n", sizeof(odbc_result_value), result->numcols );
+fprintf(stderr, "[dean] memory %zd\n", zend_memory_usage(true));
+	fprintf(stderr, "[dean] %d %d %d %d %d %d %d %d %d\n", SQL_TIME     , 
+SQL_TIMESTAMP    , 
+SQL_LONGVARCHAR  , 
+SQL_BINARY       , 
+SQL_VARBINARY    , 
+SQL_LONGVARBINARY, 
+SQL_BIGINT       , 
+SQL_TINYINT      , 
+SQL_BIT  );        
 
 	result->values = (odbc_result_value *) safe_emalloc(sizeof(odbc_result_value), result->numcols, 0);
 
@@ -544,6 +555,7 @@ int odbc_bindcols(odbc_result *result)
 	result->binmode = ODBCG(defaultbinmode);
 
 	for(i = 0; i < result->numcols; i++) {
+		fprintf(stderr, "[dean] memoryA %zd\n", zend_memory_usage(true));
 		charextraalloc = 0;
 		colfieldid = SQL_COLUMN_DISPLAY_SIZE;
 
@@ -557,6 +569,7 @@ int odbc_bindcols(odbc_result *result)
 		 * be controlled by odbc_binmode() / odbc_longreadlen()
 		 */
 
+fprintf(stderr, "[dean] memoryB %zd\n", zend_memory_usage(true));
 		switch(result->values[i].coltype) {
 			case SQL_BINARY:
 			case SQL_VARBINARY:
@@ -587,11 +600,13 @@ int odbc_bindcols(odbc_result *result)
 				/* TODO: Check this is the intended behaviour */
 				ZEND_FALLTHROUGH;
 			default:
+				fprintf(stderr, "[dean] memoryC %zd\n", zend_memory_usage(true));
 				rc = PHP_ODBC_SQLCOLATTRIBUTE(result->stmt, (SQLUSMALLINT)(i+1), colfieldid,
 								NULL, 0, NULL, &displaysize);
 				if (rc != SQL_SUCCESS) {
 					displaysize = 0;
 				}
+				fprintf(stderr, "[dean] memoryD %zd %ld\n", zend_memory_usage(true), displaysize);
 #if defined(ODBCVER) && (ODBCVER >= 0x0300)
 				if (rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO && colfieldid == SQL_DESC_OCTET_LENGTH) {
 					SQLINTEGER err;
@@ -614,7 +629,10 @@ int odbc_bindcols(odbc_result *result)
 					if (rc != SQL_SUCCESS) {
 						displaysize = 0;
 					}
+
+					fprintf(stderr, "[dean] charextraalloc %zd %ld\n", zend_memory_usage(true), charextraalloc);
 				}
+				fprintf(stderr, "[dean] memoryE %zd\n", zend_memory_usage(true));
 
 				/* Workaround for drivers that report NVARCHAR(MAX) columns as SQL_WVARCHAR with size 0 (bug #69975) */
 				if (result->values[i].coltype == SQL_WVARCHAR && displaysize == 0) {
@@ -640,10 +658,17 @@ int odbc_bindcols(odbc_result *result)
 					displaysize *= 4;
 				}
 				result->values[i].value = (char *)emalloc(displaysize + 1);
+				fprintf(stderr, "[dean] memoryF %zd %ld\n", zend_memory_usage(true), displaysize);
+				fprintf(stderr, "[dean] memoryF %zd\n", zend_memory_usage(true));
 				rc = SQLBindCol(result->stmt, (SQLUSMALLINT)(i+1), SQL_C_CHAR, result->values[i].value,
 							displaysize + 1, &result->values[i].vallen);
+				
+				fprintf(stderr, "[dean] memoryH %zd\n", zend_memory_usage(true));
 				break;
 		}
+
+		fprintf( stderr, "[dean] odbc_bindcols column %ld\n", result->values[i].coltype);
+		fprintf(stderr, "[dean] memory %zd\n", zend_memory_usage(true));
 	}
 	return 1;
 }

@@ -22,8 +22,10 @@ set -eu -o pipefail
  --with-mysqli \
  --with-openssl \
  --with-pdo-mysql \
+ --with-odbc \
+ --with-unixODBC \
  --with-pgsql \
  --with-xsl \
  --with-zlib
 
-make -j 8
+make -j 4
